@@ -33,42 +33,6 @@
 
   <p id="message"></p>
 
-
-  document.getElementById('declarationForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    const form = event.target;
-    const formData = new FormData(form);
-    const payload = JSON.stringify(Object.fromEntries(formData.entries()));
-
-    const appsScriptUrl = 'https://script.google.com/macros/s/AKfycbzjohu0B96qGMAXekVuWKWeNW3ycj8RZUA2c1PnEMENOiHdf8kGJja-731uVq7rM057/exec';
-    const messageElement = document.getElementById('message');
-    messageElement.textContent = 'Enviando...';
-
-    try {
-      const sendForm = new FormData();
-      sendForm.append('payload', payload);
-
-      const response = await fetch(appsScriptUrl, {
-        method: 'POST',
-        body: sendForm
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        messageElement.textContent = '✅ ¡Datos guardados exitosamente!';
-        form.reset();
-      } else {
-        messageElement.textContent = `❌ Error: ${result.message}`;
-      }
-    } catch (error) {
-      messageElement.textContent = `❌ Error al conectar con el servidor: ${error.message}`;
-      console.error('Error:', error);
-    }
-  });
-</script> -->
-
 <script>
   document.getElementById('declarationForm').addEventListener('submit', async function(event) {
   event.preventDefault();
