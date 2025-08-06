@@ -33,7 +33,7 @@
 
   <p id="message"></p>
 
-<script>
+  <script>
   document.getElementById('declarationForm').addEventListener('submit', async function(event) {
   event.preventDefault();
 
@@ -51,8 +51,12 @@
 
     const response = await fetch(appsScriptUrl, {
       method: 'POST',
-      body: sendForm // 👈 evita OPTIONS
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `payload=${encodeURIComponent(payload)}`
     });
+
 
     const result = await response.json();
 
@@ -68,6 +72,9 @@
   }
 });
 </script>
+
+
+
 
 
 
