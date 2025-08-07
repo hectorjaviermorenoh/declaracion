@@ -1,84 +1,29 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Formulario de Declaración</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-    }
-    form {
-      border: 1px solid #ccc;
-      padding: 20px;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 500px;
-    }
-    input, button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-    }
-    .error {
-      color: red;
-      margin-top: 10px;
-    }
-    .success {
-      color: green;
-      margin-top: 10px;
-    }
-  </style>
 </head>
 <body>
 
-  <form id="formulario">
-    <h2>Formulario de Declaración</h2>
+  <h2>Formulario de Declaración</h2>
 
-    <label>Nombre:</label>
-    <input type="text" name="nombre" required />
+  <form action="https://script.google.com/macros/s/AKfycbwcU_8GXdhCTw1WXRcC3Ia3x4YSA7aFcDbL5Fk9P0Cru_OAKrfHFL65D7aTzpB7XRUx7Q/exec"
+        method="POST"
+        enctype="multipart/form-data"
+        target="_blank"> <!-- Abrir en otra pestaña para evitar CORS -->
 
-    <label>Apellido:</label>
-    <input type="text" name="apellido" required />
+    <label>Nombre:</label><br>
+    <input type="text" name="nombre" required><br><br>
 
-    <label>Subir archivos:</label>
-    <input type="file" name="archivos[]" multiple />
+    <label>Apellido:</label><br>
+    <input type="text" name="apellido" required><br><br>
 
-
+    <label>Archivos:</label><br>
+    <input type="file" name="archivos[]" multiple><br><br>
 
     <button type="submit">Enviar</button>
-
-    <div id="respuesta"></div>
   </form>
-
-  <script>
-    const form = document.getElementById("formulario");
-    const respuesta = document.getElementById("respuesta");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const formData = new FormData(form);
-
-      try {
-        const res = await fetch("https://appexternaarchivos.manzjulio064.workers.dev/", {
-          method: "POST",
-          body: formData
-          // ✅ NO pongas Content-Type, el navegador lo hace automáticamente
-        });
-
-        const data = await res.json();
-
-        respuesta.innerHTML = `<div class="success">✅ ${data.message || 'Enviado correctamente'}</div>`;
-      } catch (err) {
-        console.error(err);
-        respuesta.innerHTML = `<div class="error">❌ Error: ${err.message}</div>`;
-      }
-    });
-  </script>
 
 </body>
 </html>
