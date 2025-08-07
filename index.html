@@ -2,105 +2,81 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Formulario de Declaración archivos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Formulario de Declaración</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 2em auto;
-      padding: 1em;
+      font-family: sans-serif;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    form {
       border: 1px solid #ccc;
+      padding: 20px;
       border-radius: 8px;
-    }
-    h1 {
-      text-align: center;
-    }
-    form div {
-      margin-bottom: 1em;
-    }
-    label {
-      display: block;
-      margin-bottom: 0.5em;
-    }
-    input[type="text"],
-    input[type="file"] {
       width: 100%;
-      padding: 0.8em;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      max-width: 500px;
     }
-    button {
-      padding: 1em 2em;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+    input, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
     }
-    button:hover {
-      background-color: #0056b3;
+    .error {
+      color: red;
+      margin-top: 10px;
     }
-    #message {
-      margin-top: 1em;
-      text-align: center;
-      font-weight: bold;
+    .success {
+      color: green;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Formulario de Declaración</h1>
 
-  <form id="declarationForm" enctype="multipart/form-data">
-    <div>
-      <label for="nombre">Nombre:</label>
-      <input type="text" id="nombre" name="nombre" required />
-    </div>
-    <div>
-      <label for="apellido">Apellido:</label>
-      <input type="text" id="apellido" name="apellido" required />
-    </div>
-    <div>
-      <label for="archivos">Subir archivos:</label>
-      <input type="file" id="archivos" name="archivos" multiple />
-    </div>
+  <form id="formulario">
+    <h2>Formulario de Declaración</h2>
+
+    <label>Nombre:</label>
+    <input type="text" name="nombre" required />
+
+    <label>Apellido:</label>
+    <input type="text" name="apellido" required />
+
+    <label>Subir archivos:</label>
+    <input type="file" name="archivos" multiple required />
+
     <button type="submit">Enviar</button>
+
+    <div id="respuesta"></div>
   </form>
 
-  <p id="message"></p>
-
   <script>
-    const form = document.getElementById('declarationForm');
-    const messageElement = document.getElementById('message');
+    const form = document.getElementById("formulario");
+    const respuesta = document.getElementById("respuesta");
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      messageElement.textContent = "⏳ Enviando...";
 
       const formData = new FormData(form);
 
-      const url = "https://frosty-moon-992d.manzjulio064.workers.dev/"; // Tu proxy (Cloudflare Worker)
-
       try {
-        const response = await fetch(url, {
+        const res = await fetch("https://appexternaarchivos.manzjulio064.workers.dev/", {
           method: "POST",
           body: formData
+          // ✅ NO pongas Content-Type, el navegador lo hace automáticamente
         });
 
-        const result = await response.json();
+        const data = await res.json();
 
-        if (result.success) {
-          messageElement.textContent = result.message;
-          form.reset();
-        } else {
-          messageElement.textContent = `❌ ${result.message}`;
-        }
-
-      } catch (error) {
-        messageElement.textContent = `❌ Error: ${error.message}`;
-        console.error("Error al enviar:", error);
+        respuesta.innerHTML = `<div class="success">✅ ${data.message || 'Enviado correctamente'}</div>`;
+      } catch (err) {
+        console.error(err);
+        respuesta.innerHTML = `<div class="error">❌ Error: ${err.message}</div>`;
       }
     });
   </script>
+
 </body>
 </html>
