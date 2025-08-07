@@ -1,17 +1,50 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Formulario de Declaración</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 2em auto; padding: 1em; border: 1px solid #ccc; border-radius: 8px; }
-    h1 { text-align: center; }
-    form div { margin-bottom: 1em; }
-    label { display: block; margin-bottom: 0.5em; }
-    input[type="text"] { width: 100%; padding: 0.8em; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    button { padding: 1em 2em; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background-color: #0056b3; }
-    #message { margin-top: 1em; text-align: center; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 2em auto;
+      padding: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    h1 {
+      text-align: center;
+    }
+    form div {
+      margin-bottom: 1em;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5em;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.8em;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 1em 2em;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #message {
+      margin-top: 1em;
+      text-align: center;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -20,11 +53,11 @@
   <form id="declarationForm">
     <div>
       <label for="nombre">Nombre:</label>
-      <input type="text" id="nombre" name="nombre" required>
+      <input type="text" id="nombre" name="nombre" required />
     </div>
     <div>
       <label for="apellido">Apellido:</label>
-      <input type="text" id="apellido" name="apellido" required>
+      <input type="text" id="apellido" name="apellido" required />
     </div>
     <button type="submit">Enviar</button>
   </form>
@@ -32,53 +65,49 @@
   <p id="message"></p>
 
   <script>
-  const form = document.getElementById('declarationForm');
-  const messageElement = document.getElementById('message');
+    const form = document.getElementById('declarationForm');
+    const messageElement = document.getElementById('message');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Evita que se recargue la página
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-    const formData = new FormData(form);
-    const payload = Object.fromEntries(formData.entries());
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
 
-    messageElement.textContent = "⏳ Enviando...";
+      messageElement.textContent = "⏳ Enviando...";
 
-    const url = "https://script.google.com/macros/s/AKfycbyhnTKh7po-X3It07BpeK7_YXA5jKSq37DsZ3sDJ8vabNmrM-eEEBh1GX9KsLulNun0/exec"; // 🔁 Pon aquí tu URL real del Web App
+      const url = "https://frosty-moon-992d.manjulio064.workers.dev"; // 🔁 Tu Cloudflare Worker proxy
 
-    const settings = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    };
+      const settings = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      };
 
-    try {
-      const response = await fetch(url, settings);
+      try {
+        const response = await fetch(url, settings);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Error HTTP ${response.status}: ${errorText}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+          messageElement.textContent = data.message;
+          form.reset();
+        } else {
+          messageElement.textContent = `❌ ${data.message}`;
+        }
+
+      } catch (error) {
+        messageElement.textContent = `❌ Error: ${error.message}`;
+        console.error("Error al enviar:", error);
       }
-
-      const data = await response.json();
-
-      if (data.success) {
-        messageElement.textContent = data.message;
-        form.reset();
-      } else {
-        messageElement.textContent = `❌ ${data.message}`;
-      }
-
-    } catch (error) {
-      messageElement.textContent = `❌ Error: ${error.message}`;
-      console.error("Error al enviar:", error);
-    }
-  });
-</script>
-
-
-
-
+    });
+  </script>
 </body>
 </html>
