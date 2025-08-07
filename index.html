@@ -35,35 +35,49 @@
   const form = document.getElementById('declarationForm');
   const messageElement = document.getElementById('message');
 
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Evita que se recargue la página
 
     const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
 
     messageElement.textContent = "⏳ Enviando...";
 
-    fetch('https://script.google.com/macros/s/AKfycbyhnTKh7po-X3It07BpeK7_YXA5jKSq37DsZ3sDJ8vabNmrM-eEEBh1GX9KsLulNun0/exec', {
-      method: 'POST',
-      body: JSON.stringify(payload),
+    const url = "https://script.google.com/macros/s/AKfycbyhnTKh7po-X3It07BpeK7_YXA5jKSq37DsZ3sDJ8vabNmrM-eEEBh1GX9KsLulNun0/exec"; // 🔁 Pon aquí tu URL real del Web App
+
+    const settings = {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    };
+
+    try {
+      const response = await fetch(url, settings);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error HTTP ${response.status}: ${errorText}`);
       }
-    })
-    .then(response => response.json())
-    .then(data => {
+
+      const data = await response.json();
+
       if (data.success) {
         messageElement.textContent = data.message;
         form.reset();
       } else {
         messageElement.textContent = `❌ ${data.message}`;
       }
-    })
-    .catch(error => {
-      messageElement.textContent = `❌ Error de red: ${error.message}`;
-    });
+
+    } catch (error) {
+      messageElement.textContent = `❌ Error: ${error.message}`;
+      console.error("Error al enviar:", error);
+    }
   });
 </script>
+
+
 
 
 </body>
