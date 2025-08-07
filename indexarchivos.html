@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Formulario de Declaración</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 2em auto;
+      padding: 1em;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    h1 {
+      text-align: center;
+    }
+    form div {
+      margin-bottom: 1em;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5em;
+    }
+    input[type="text"],
+    input[type="file"] {
+      width: 100%;
+      padding: 0.8em;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 1em 2em;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #message {
+      margin-top: 1em;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Formulario de Declaración</h1>
+
+  <form id="declarationForm" enctype="multipart/form-data">
+    <div>
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" required />
+    </div>
+    <div>
+      <label for="apellido">Apellido:</label>
+      <input type="text" id="apellido" name="apellido" required />
+    </div>
+    <div>
+      <label for="archivos">Subir archivos:</label>
+      <input type="file" id="archivos" name="archivos" multiple />
+    </div>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    const form = document.getElementById('declarationForm');
+    const messageElement = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      messageElement.textContent = "⏳ Enviando...";
+
+      const formData = new FormData(form);
+
+      const url = "https://frosty-moon-992d.manzjulio064.workers.dev/"; // Tu proxy (Cloudflare Worker)
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          messageElement.textContent = result.message;
+          form.reset();
+        } else {
+          messageElement.textContent = `❌ ${result.message}`;
+        }
+
+      } catch (error) {
+        messageElement.textContent = `❌ Error: ${error.message}`;
+        console.error("Error al enviar:", error);
+      }
+    });
+  </script>
+</body>
+</html>
