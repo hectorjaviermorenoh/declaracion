@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Formulario de Declaración</title>
+  <title>Formulario de Declaración archivos</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,7 +22,8 @@
       display: block;
       margin-bottom: 0.5em;
     }
-    input[type="text"] {
+    input[type="text"],
+    input[type="file"] {
       width: 100%;
       padding: 0.8em;
       box-sizing: border-box;
@@ -50,7 +51,7 @@
 <body>
   <h1>Formulario de Declaración</h1>
 
-  <form id="declarationForm">
+  <form id="declarationForm" enctype="multipart/form-data">
     <div>
       <label for="nombre">Nombre:</label>
       <input type="text" id="nombre" name="nombre" required />
@@ -58,6 +59,10 @@
     <div>
       <label for="apellido">Apellido:</label>
       <input type="text" id="apellido" name="apellido" required />
+    </div>
+    <div>
+      <label for="archivos">Subir archivos:</label>
+      <input type="file" id="archivos" name="archivos" multiple />
     </div>
     <button type="submit">Enviar</button>
   </form>
@@ -70,37 +75,25 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      const formData = new FormData(form);
-      const payload = Object.fromEntries(formData.entries());
-
       messageElement.textContent = "⏳ Enviando...";
 
-      const url = "https://frosty-moon-992d.manzjulio064.workers.dev/"; // Tu proxy
+      const formData = new FormData(form);
 
-      const settings = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      };
+      const url = "https://frosty-moon-992d.manzjulio064.workers.dev/"; // Tu proxy (Cloudflare Worker)
 
       try {
-        const response = await fetch(url, settings);
+        const response = await fetch(url, {
+          method: "POST",
+          body: formData
+        });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Error HTTP ${response.status}: ${errorText}`);
-        }
+        const result = await response.json();
 
-        const data = await response.json();
-
-        if (data.success) {
-          messageElement.textContent = data.message;
+        if (result.success) {
+          messageElement.textContent = result.message;
           form.reset();
         } else {
-          messageElement.textContent = `❌ ${data.message}`;
+          messageElement.textContent = `❌ ${result.message}`;
         }
 
       } catch (error) {
