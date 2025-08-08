@@ -1,28 +1,48 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Formulario de Declaración</title>
-</head>
-<body>
+<script>
+const form = document.getElementById('declarationForm');
+const messageElement = document.getElementById('message');
 
-  <h2>Formulario de Declaración</h2>
+// URL de tu Cloudflare Worker
+const WORKER_URL = "https://appexternaarchivos.manzjulio064.workers.dev/";
 
-  <form action="https://appexternaarchivos.manzjulio064.workers.dev"
-        method="POST"
-        enctype="multipart/form-data">
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
 
-    <label>Nombre:</label><br>
-    <input type="text" name="nombre" required><br><br>
+  const formData = new FormData(form);
+  const archivo = formData.get('archivo');
 
-    <label>Apellido:</label><br>
-    <input type="text" name="apellido" required><br><br>
+  if (!archivo) {
+    messageElement.textContent = "❌ Debes adjuntar un archivo.";
+    return;
+  }
 
-    <label>Archivos:</label><br>
-    <input type="file" name="archivos" multiple />
+  const reader = new FileReader();
+  reader.onload = function() {
+    const payload = {
+      nombre: formData.get('nombre'),
+      apellido: formData.get('apellido'),
+      archivoNombre: archivo.name,
+      archivoTipo: archivo.type,
+      archivoBase64: reader.result.split(',')[1]
+    };
 
-    <button type="submit">Enviar</button>
-  </form>
+    messageElement.textContent = "⏳ Enviando...";
 
-</body>
-</html>
+    fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(response => {
+      messageElement.textContent = response.success ? response.message : `❌ ${response.message}`;
+      if (response.success) form.reset();
+    })
+    .catch(error => {
+      messageElement.textContent = `❌ Error: ${error.message}`;
+    });
+  };
+  reader.readAsDataURL(archivo);
+});
+</script>
+
